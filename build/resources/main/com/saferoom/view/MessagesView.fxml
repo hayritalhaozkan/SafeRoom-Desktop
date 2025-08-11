@@ -1,81 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<!-- Ana konteyner SplitPane olarak değiştirildi -->
 <SplitPane fx:id="mainSplitPane" dividerPositions="0.3" styleClass="messages-container" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.saferoom.controller.MessagesController">
     <items>
-        <!-- SOL BÖLME: Kişi Listesi -->
         <BorderPane fx:id="contactListPane" minWidth="280.0" maxWidth="450.0" styleClass="contact-list-pane">
             <top>
-                <VBox styleClass="search-box-container" BorderPane.alignment="CENTER">
-                    <children>
-                        <TextField promptText="Search messages..." styleClass="search-field" />
-                    </children>
+                <VBox styleClass="search-box-container">
+                    <children><TextField promptText="Search messages..." styleClass="search-field" /></children>
                 </VBox>
             </top>
             <center>
-                <ListView fx:id="contactListView" styleClass="contact-list-view" BorderPane.alignment="CENTER" />
+                <ListView fx:id="contactListView" styleClass="contact-list-view" />
             </center>
         </BorderPane>
 
-        <!-- SAĞ BÖLME: Sohbet Alanı -->
-        <BorderPane fx:id="chatPane">
-            <top>
-                <HBox alignment="CENTER_LEFT" styleClass="chat-header" BorderPane.alignment="CENTER">
-                    <children>
-                        <Label fx:id="chatPartnerAvatar" styleClass="contact-avatar" text="ZK" />
-                        <VBox>
-                            <children>
-                                <Label fx:id="chatPartnerName" styleClass="chat-partner-name" text="Zeynep Kaya" />
-                                <Label fx:id="chatPartnerStatus" styleClass="status-online" text="Online" />
-                            </children>
-                        </VBox>
-                        <Pane HBox.hgrow="ALWAYS" />
-                        <Button styleClass="icon-button" mnemonicParsing="false">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-phone" styleClass="header-icon" />
-                            </graphic>
-                        </Button>
-                        <Button styleClass="icon-button" mnemonicParsing="false">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-video" styleClass="header-icon" />
-                            </graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </top>
-            <center>
-                <ListView fx:id="messageListView" styleClass="message-list-view" BorderPane.alignment="CENTER" />
-            </center>
-            <bottom>
-                <HBox alignment="CENTER" styleClass="chat-input-area" BorderPane.alignment="CENTER">
-                    <children>
-                        <Button styleClass="icon-button" mnemonicParsing="false">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-plus" styleClass="input-area-icon" />
-                            </graphic>
-                        </Button>
-                        <TextField fx:id="messageInputField" promptText="Type a secure message..." styleClass="chat-input-field" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="sendButton" styleClass="send-button" mnemonicParsing="false">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-paper-plane" styleClass="send-icon" />
-                            </graphic>
-                        </Button>
-                    </children>
-                </HBox>
-            </bottom>
-        </BorderPane>
+        <fx:include fx:id="chatView" source="ChatView.fxml"/>
+
     </items>
 </SplitPane>

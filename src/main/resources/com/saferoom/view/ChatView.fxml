@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane fx:id="chatPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.saferoom.controller.ChatViewController">
+    <top>
+        <HBox fx:id="chatHeader" alignment="CENTER_LEFT" styleClass="chat-header" BorderPane.alignment="CENTER">
+            <children>
+                <Label fx:id="chatPartnerAvatar" styleClass="contact-avatar" />
+                <VBox>
+                    <children>
+                        <Label fx:id="chatPartnerName" styleClass="chat-partner-name" />
+                        <Label fx:id="chatPartnerStatus" />
+                    </children>
+                </VBox>
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button fx:id="phoneButton" styleClass="icon-button" mnemonicParsing="false">
+                    <graphic><FontIcon iconLiteral="fas-phone" styleClass="header-icon" /></graphic>
+                </Button>
+                <Button fx:id="videoButton" styleClass="icon-button" mnemonicParsing="false">
+                    <graphic><FontIcon iconLiteral="fas-video" styleClass="header-icon" /></graphic>
+                </Button>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <ListView fx:id="messageListView" styleClass="message-list-view" BorderPane.alignment="CENTER" />
+    </center>
+    <bottom>
+        <HBox alignment="CENTER" styleClass="chat-input-area" BorderPane.alignment="CENTER">
+            <children>
+                <Button styleClass="icon-button" mnemonicParsing="false">
+                    <graphic><FontIcon iconLiteral="fas-plus" styleClass="input-area-icon" /></graphic>
+                </Button>
+                <TextField fx:id="messageInputField" promptText="Type a secure message..." styleClass="chat-input-field" HBox.hgrow="ALWAYS" />
+                <Button fx:id="sendButton" onAction="#handleSendMessage" styleClass="send-button" mnemonicParsing="false">
+                    <graphic><FontIcon iconLiteral="fas-paper-plane" styleClass="send-icon" /></graphic>
+                </Button>
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

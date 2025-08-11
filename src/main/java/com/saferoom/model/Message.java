@@ -1,21 +1,17 @@
 package com.saferoom.model;
 
-/**
- * Sohbet ekranındaki her bir mesajın verilerini tutan sınıf (Model).
- */
 public class Message {
     private final String text;
-    private final boolean sentByMe;
-    private final String avatarChar;
+    private final String senderId; // 'sentByMe' yerine gönderenin kimliği
+    private final String senderAvatarChar; // Gönderenin avatarı
 
-    public Message(String text, boolean sentByMe, String avatarChar) {
+    public Message(String text, String senderId, String senderAvatarChar) {
         this.text = text;
-        this.sentByMe = sentByMe;
-        this.avatarChar = avatarChar;
+        this.senderId = senderId;
+        this.senderAvatarChar = senderAvatarChar;
     }
 
-    // FXML ve Controller tarafından erişilecek olan Getter metodları
     public String getText() { return text; }
-    public boolean isSentByMe() { return sentByMe; }
-    public String getAvatarChar() { return avatarChar; }
+    public String getSenderId() { return senderId; }
+    public String getSenderAvatarChar() { return senderAvatarChar; }
 }
