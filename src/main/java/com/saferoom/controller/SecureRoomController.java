@@ -5,15 +5,22 @@ import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
+import com.saferoom.MainApp;
+import com.saferoom.model.Meeting;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -22,7 +29,8 @@ import java.util.Random;
 
 public class SecureRoomController {
 
-    @FXML private VBox rootPane;
+    @FXML private StackPane scalingContainer;
+    @FXML private HBox mainContent;
     @FXML private JFXButton backButton;
     @FXML private Button initiateButton;
     @FXML private JFXComboBox<String> audioInputBox;
@@ -35,57 +43,82 @@ public class SecureRoomController {
     @FXML private JFXSlider outputVolumeSlider;
     @FXML private JFXCheckBox autoDestroyCheck;
     @FXML private JFXCheckBox noLogsCheck;
+    @FXML private TextField roomIdField;
 
     private Timeline micAnimation;
+    private Scene returnScene;
+
+    private static final double DESIGN_WIDTH = 1160;
+    private static final double DESIGN_HEIGHT = 680;
+
+    public void setReturnScene(Scene scene) {
+        this.returnScene = scene;
+    }
 
     @FXML
     public void initialize() {
-        // Örnek verilerle ComboBox'ları doldur
+        NumberBinding scaleX = scalingContainer.widthProperty().divide(DESIGN_WIDTH);
+        NumberBinding scaleY = scalingContainer.heightProperty().divide(DESIGN_HEIGHT);
+        NumberBinding scale = Bindings.min(scaleX, scaleY);
+        mainContent.scaleXProperty().bind(scale);
+        mainContent.scaleYProperty().bind(scale);
+
         audioInputBox.getItems().addAll("Default - MacBook Pro Microphone", "External USB Mic");
         audioOutputBox.getItems().addAll("Default - MacBook Pro Speakers", "Bluetooth Headphones");
         cameraSourceBox.getItems().addAll("FaceTime HD Camera", "External Webcam");
 
-        // Başlangıç değerleri ata
         audioInputBox.getSelectionModel().selectFirst();
         audioOutputBox.getSelectionModel().selectFirst();
         cameraSourceBox.getSelectionModel().selectFirst();
 
-        backButton.setOnAction(event -> handleBackToMain());
+        backButton.setOnAction(event -> handleBack());
         initiateButton.setOnAction(event -> handleInitiate());
 
-        // Mikrofon test animasyonunu başlat
         startMicTestAnimation();
     }
 
     private void handleInitiate() {
-        System.out.println("Initiating Zero-Trace Room...");
-        System.out.println("Camera On: " + cameraToggle.isSelected());
-        System.out.println("Mic On: " + micToggle.isSelected());
-        System.out.println("Auto-destroy: " + autoDestroyCheck.isSelected());
-        System.out.println("No server-side logs: " + noLogsCheck.isSelected());
-        // TODO: Odayı başlatma mantığı buraya eklenecek.
+        if (micAnimation != null) micAnimation.stop();
+
+        if (returnScene != null) {
+            try {
+                FXMLLoader meetingLoader = new FXMLLoader(MainApp.class.getResource("view/MeetingPanelView.fxml"));
+                Parent meetingRoot = meetingLoader.load();
+
+                MeetingPanelController meetingController = meetingLoader.getController();
+                Meeting secureMeeting = new Meeting(roomIdField.getText(), "Secure Room");
+                meetingController.initData(secureMeeting);
+
+                returnScene.setRoot(meetingRoot);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void startMicTestAnimation() {
         micAnimation = new Timeline(new KeyFrame(Duration.millis(100), event -> {
-            Random random = new Random();
-            micTestBar.setProgress(random.nextDouble() * 0.7);
+            if (micToggle.isSelected()) {
+                micTestBar.setProgress(new Random().nextDouble() * 0.7);
+            } else {
+                micTestBar.setProgress(0);
+            }
         }));
         micAnimation.setCycleCount(Animation.INDEFINITE);
         micAnimation.play();
     }
 
-    private void handleBackToMain() {
-        try {
-            if (micAnimation != null) {
-                micAnimation.stop();
+    private void handleBack() {
+        if (micAnimation != null) micAnimation.stop();
+
+        if (returnScene != null) {
+            try {
+                Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(MainApp.class.getResource("view/MainView.fxml")));
+                returnScene.setRoot(mainRoot);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/com/saferoom/view/MainView.fxml")));
-            if (rootPane.getScene() != null) {
-                rootPane.getScene().setRoot(mainRoot);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
