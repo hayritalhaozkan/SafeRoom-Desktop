@@ -7,11 +7,10 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import com.saferoom.MainApp;
 import com.saferoom.model.Meeting;
+import com.saferoom.model.UserRole; // Düzeltme için import eklendi
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.NumberBinding;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,8 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -29,9 +27,9 @@ import java.util.Random;
 
 public class SecureRoomController {
 
-    @FXML private StackPane scalingContainer;
-    @FXML private HBox mainContent;
+    @FXML private VBox rootPane;
     @FXML private JFXButton backButton;
+    @FXML private TextField roomIdField;
     @FXML private Button initiateButton;
     @FXML private JFXComboBox<String> audioInputBox;
     @FXML private JFXComboBox<String> audioOutputBox;
@@ -43,13 +41,9 @@ public class SecureRoomController {
     @FXML private JFXSlider outputVolumeSlider;
     @FXML private JFXCheckBox autoDestroyCheck;
     @FXML private JFXCheckBox noLogsCheck;
-    @FXML private TextField roomIdField;
 
     private Timeline micAnimation;
     private Scene returnScene;
-
-    private static final double DESIGN_WIDTH = 1160;
-    private static final double DESIGN_HEIGHT = 680;
 
     public void setReturnScene(Scene scene) {
         this.returnScene = scene;
@@ -57,12 +51,6 @@ public class SecureRoomController {
 
     @FXML
     public void initialize() {
-        NumberBinding scaleX = scalingContainer.widthProperty().divide(DESIGN_WIDTH);
-        NumberBinding scaleY = scalingContainer.heightProperty().divide(DESIGN_HEIGHT);
-        NumberBinding scale = Bindings.min(scaleX, scaleY);
-        mainContent.scaleXProperty().bind(scale);
-        mainContent.scaleYProperty().bind(scale);
-
         audioInputBox.getItems().addAll("Default - MacBook Pro Microphone", "External USB Mic");
         audioOutputBox.getItems().addAll("Default - MacBook Pro Speakers", "Bluetooth Headphones");
         cameraSourceBox.getItems().addAll("FaceTime HD Camera", "External Webcam");
@@ -79,18 +67,17 @@ public class SecureRoomController {
 
     private void handleInitiate() {
         if (micAnimation != null) micAnimation.stop();
-
         if (returnScene != null) {
             try {
                 FXMLLoader meetingLoader = new FXMLLoader(MainApp.class.getResource("view/MeetingPanelView.fxml"));
                 Parent meetingRoot = meetingLoader.load();
-
                 MeetingPanelController meetingController = meetingLoader.getController();
                 Meeting secureMeeting = new Meeting(roomIdField.getText(), "Secure Room");
-                meetingController.initData(secureMeeting);
+
+                // DÜZELTME: initData metoduna UserRole.ADMIN parametresi eklendi.
+                meetingController.initData(secureMeeting, UserRole.ADMIN);
 
                 returnScene.setRoot(meetingRoot);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -111,7 +98,6 @@ public class SecureRoomController {
 
     private void handleBack() {
         if (micAnimation != null) micAnimation.stop();
-
         if (returnScene != null) {
             try {
                 Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(MainApp.class.getResource("view/MainView.fxml")));

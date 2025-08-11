@@ -2,8 +2,12 @@ package com.saferoom.controller;
 
 import com.jfoenix.controls.JFXButton;
 import com.saferoom.MainApp;
+import com.saferoom.controller.strategy.AdminRoleStrategy;
+import com.saferoom.controller.strategy.MeetingRoleStrategy;
+import com.saferoom.controller.strategy.UserRoleStrategy;
 import com.saferoom.model.Meeting;
 import com.saferoom.model.Participant;
+import com.saferoom.model.UserRole;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -26,7 +30,6 @@ import java.util.Objects;
 
 public class MeetingPanelController {
 
-    // FXML Değişkenleri
     @FXML private BorderPane gridWrapperPane;
     @FXML private GridPane videoGrid;
     @FXML private BorderPane speakerViewPane;
@@ -41,16 +44,10 @@ public class MeetingPanelController {
     @FXML private ScrollPane participantsScrollPane;
     @FXML private VBox participantsListVBox;
     @FXML private VBox chatVBox;
-    @FXML private Label timerLabel;
-    @FXML private JFXButton micButton;
-    @FXML private JFXButton cameraButton;
-    @FXML private JFXButton chatButtonBottom;
-    @FXML private JFXButton screenShareButton;
-    @FXML private JFXButton recordButton;
-    @FXML private JFXButton participantsButtonTop;
-
 
     private Meeting currentMeeting;
+    private Participant currentUser;
+    private MeetingRoleStrategy roleStrategy;
     private boolean isPanelOpen = false;
     private final Duration animationDuration = Duration.millis(350);
 
@@ -59,20 +56,72 @@ public class MeetingPanelController {
         rightPanelVBox.setTranslateX(320);
         rightPanelVBox.setVisible(false);
         rightPanelVBox.setMaxWidth(rightPanelVBox.getPrefWidth());
-
         gridViewButton.setOnAction(e -> showGridView());
         speakerViewButton.setOnAction(e -> showSpeakerView());
         participantsToggle.setOnAction(e -> showParticipantsView());
         chatToggle.setOnAction(e -> showChatView());
     }
 
-    public void initData(Meeting meeting) {
+    public void initData(Meeting meeting, UserRole userRole) {
         this.currentMeeting = meeting;
-        meetingNameLabel.setText(meeting.getMeetingName());
-        currentMeeting.addDummyParticipants();
 
+        if (userRole == UserRole.ADMIN) {
+            this.roleStrategy = new AdminRoleStrategy();
+            this.currentUser = new Participant("Admin User (You)", UserRole.ADMIN, true, true);
+        } else {
+            this.roleStrategy = new UserRoleStrategy();
+            this.currentUser = new Participant("Standard User (You)", UserRole.USER, true, true);
+        }
+
+        currentMeeting.getParticipants().add(0, this.currentUser);
+        meeting.addDummyParticipants();
+
+        meetingNameLabel.setText(meeting.getMeetingName());
         updateParticipantsList();
         showGridView();
+    }
+
+    private void updateParticipantsList() {
+        participantsListVBox.getChildren().clear();
+        for (Participant p : currentMeeting.getParticipants()) {
+            participantsListVBox.getChildren().add(createParticipantListItem(p));
+        }
+    }
+
+    private Node createParticipantListItem(Participant participant) {
+        HBox itemBox = new HBox(12);
+        itemBox.setAlignment(Pos.CENTER_LEFT);
+        itemBox.setPadding(new Insets(8, 16, 8, 16));
+
+        Label avatar = new Label(participant.getName().substring(0, 1));
+        avatar.getStyleClass().add("participant-avatar");
+
+        VBox nameBox = new VBox(-2);
+        Label nameLabel = new Label(participant.getName());
+        nameLabel.getStyleClass().add("participant-name");
+        Label roleLabel = new Label(participant.getRole() == UserRole.ADMIN ? "Admin" : "Member");
+        roleLabel.getStyleClass().add("participant-role");
+        nameBox.getChildren().addAll(nameLabel, roleLabel);
+
+        Pane spacer = new Pane();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        FontIcon micIcon = new FontIcon(participant.isMuted() ? "fas-microphone-slash" : "fas-microphone");
+        micIcon.getStyleClass().add("participant-list-icon");
+        if (participant.isMuted()) micIcon.getStyleClass().add("icon-danger");
+
+        FontIcon camIcon = new FontIcon(participant.isCameraOn() ? "fas-video" : "fas-video-slash");
+        camIcon.getStyleClass().add("participant-list-icon");
+        if (!participant.isCameraOn()) camIcon.getStyleClass().add("icon-danger");
+
+        itemBox.getChildren().addAll(avatar, nameBox, spacer, micIcon, camIcon);
+
+        Node controls = roleStrategy.createParticipantListItemControls(currentUser, participant);
+        if (controls != null) {
+            itemBox.getChildren().add(controls);
+        }
+
+        return itemBox;
     }
 
     private void showGridView() {
@@ -158,13 +207,6 @@ public class MeetingPanelController {
         }
     }
 
-    private void updateParticipantsList() {
-        participantsListVBox.getChildren().clear();
-        for (Participant p : currentMeeting.getParticipants()) {
-            participantsListVBox.getChildren().add(createParticipantListItem(p));
-        }
-    }
-
     @FXML
     private void toggleRightPanel() {
         rightPanelVBox.setVisible(true);
@@ -212,36 +254,6 @@ public class MeetingPanelController {
         chatVBox.setVisible(true);
     }
 
-    private Node createParticipantListItem(Participant participant) {
-        HBox itemBox = new HBox(12);
-        itemBox.setAlignment(Pos.CENTER_LEFT);
-        itemBox.setPadding(new Insets(8, 16, 8, 16));
-
-        Label avatar = new Label(participant.getName().substring(0, 1));
-        avatar.getStyleClass().add("participant-avatar");
-
-        VBox nameBox = new VBox(-2);
-        Label nameLabel = new Label(participant.getName());
-        nameLabel.getStyleClass().add("participant-name");
-        Label roleLabel = new Label("Member");
-        roleLabel.getStyleClass().add("participant-role");
-        nameBox.getChildren().addAll(nameLabel, roleLabel);
-
-        Pane spacer = new Pane();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        FontIcon micIcon = new FontIcon(participant.isMuted() ? "fas-microphone-slash" : "fas-microphone");
-        micIcon.getStyleClass().add("participant-list-icon");
-        if (participant.isMuted()) micIcon.getStyleClass().add("icon-danger");
-
-        FontIcon camIcon = new FontIcon(participant.isCameraOn() ? "fas-video" : "fas-video-slash");
-        camIcon.getStyleClass().add("participant-list-icon");
-        if (!participant.isCameraOn()) camIcon.getStyleClass().add("icon-danger");
-
-        itemBox.getChildren().addAll(avatar, nameBox, spacer, micIcon, camIcon);
-        return itemBox;
-    }
-
     private StackPane createVideoTile(Participant participant) {
         StackPane tile = new StackPane();
         tile.getStyleClass().add("video-tile");
@@ -271,7 +283,6 @@ public class MeetingPanelController {
 
     @FXML
     private void leaveMeeting() {
-        System.out.println("Leaving meeting: " + currentMeeting.getMeetingName());
         try {
             Scene currentScene = leaveButton.getScene();
             if (currentScene != null) {

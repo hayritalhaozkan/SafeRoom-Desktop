@@ -15,14 +15,9 @@ public class Meeting {
     }
 
     public void addDummyParticipants() {
-        participants.add(new Participant("User 1 (You)", true, true));
-        participants.add(new Participant("Alice", true, false));
-        participants.add(new Participant("Bob", false, true));
-        participants.add(new Participant("Charlie", false, false));
-        participants.add(new Participant("David", true, true));
-        participants.add(new Participant("Eve", true, false));
-        participants.add(new Participant("Frank", false, true));
-        participants.add(new Participant("Grace", true, true));
+        participants.add(new Participant("Alice", UserRole.USER, true, false));
+        participants.add(new Participant("Bob", UserRole.USER, false, true));
+        participants.add(new Participant("Charlie", UserRole.USER, false, false));
     }
 
     public String getMeetingId() { return meetingId; }

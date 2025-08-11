@@ -666,3 +666,44 @@
 .layout-button.active {
     -fx-border-color: #3b82f6;
 }
+.participant-action-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 50%;
+    -fx-padding: 6px;
+}
+
+.participant-action-button:hover {
+    -fx-background-color: #334155;
+}
+
+.participant-action-icon {
+    -fx-icon-color: #94a3b8;
+    -fx-icon-size: 14px;
+}
+
+.popup-menu-container {
+    -fx-background-color: #273345;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 4);
+}
+
+.popup-menu-item {
+    -fx-background-color: transparent;
+    -fx-text-fill: #e2e8f0;
+    -fx-font-size: 13px;
+    -fx-alignment: center-left;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-pref-width: 150px;
+}
+
+.popup-menu-item:hover {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+}
+
+.popup-menu-item-danger:hover {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: white;
+}
