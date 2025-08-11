@@ -6,7 +6,7 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import com.saferoom.MainApp;
 import com.saferoom.model.Meeting;
-import com.saferoom.model.UserRole; // Düzeltme için import eklendi
+import com.saferoom.model.UserRole;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -17,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.util.Random;
 
 public class JoinMeetController {
 
-    @FXML private VBox rootPane;
     @FXML private JFXButton backButton;
     @FXML private TextField roomIdField;
     @FXML private Button joinButton;
@@ -68,14 +66,14 @@ public class JoinMeetController {
             try {
                 FXMLLoader meetingLoader = new FXMLLoader(MainApp.class.getResource("view/MeetingPanelView.fxml"));
                 Parent meetingRoot = meetingLoader.load();
+
                 MeetingPanelController meetingController = meetingLoader.getController();
                 String roomName = roomIdField.getText().isEmpty() ? "Joined Room" : roomIdField.getText();
                 Meeting meetingToJoin = new Meeting(roomIdField.getText(), roomName);
-
-                // DÜZELTME: initData metoduna UserRole.USER parametresi eklendi.
                 meetingController.initData(meetingToJoin, UserRole.USER);
 
                 returnScene.setRoot(meetingRoot);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

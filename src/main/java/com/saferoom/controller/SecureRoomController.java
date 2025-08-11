@@ -7,7 +7,7 @@ import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXToggleButton;
 import com.saferoom.MainApp;
 import com.saferoom.model.Meeting;
-import com.saferoom.model.UserRole; // Düzeltme için import eklendi
+import com.saferoom.model.UserRole;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -18,7 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -27,9 +26,7 @@ import java.util.Random;
 
 public class SecureRoomController {
 
-    @FXML private VBox rootPane;
     @FXML private JFXButton backButton;
-    @FXML private TextField roomIdField;
     @FXML private Button initiateButton;
     @FXML private JFXComboBox<String> audioInputBox;
     @FXML private JFXComboBox<String> audioOutputBox;
@@ -41,6 +38,7 @@ public class SecureRoomController {
     @FXML private JFXSlider outputVolumeSlider;
     @FXML private JFXCheckBox autoDestroyCheck;
     @FXML private JFXCheckBox noLogsCheck;
+    @FXML private TextField roomIdField;
 
     private Timeline micAnimation;
     private Scene returnScene;
@@ -67,17 +65,18 @@ public class SecureRoomController {
 
     private void handleInitiate() {
         if (micAnimation != null) micAnimation.stop();
+
         if (returnScene != null) {
             try {
                 FXMLLoader meetingLoader = new FXMLLoader(MainApp.class.getResource("view/MeetingPanelView.fxml"));
                 Parent meetingRoot = meetingLoader.load();
+
                 MeetingPanelController meetingController = meetingLoader.getController();
                 Meeting secureMeeting = new Meeting(roomIdField.getText(), "Secure Room");
-
-                // DÜZELTME: initData metoduna UserRole.ADMIN parametresi eklendi.
                 meetingController.initData(secureMeeting, UserRole.ADMIN);
 
                 returnScene.setRoot(meetingRoot);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -98,6 +97,7 @@ public class SecureRoomController {
 
     private void handleBack() {
         if (micAnimation != null) micAnimation.stop();
+
         if (returnScene != null) {
             try {
                 Parent mainRoot = FXMLLoader.load(Objects.requireNonNull(MainApp.class.getResource("view/MainView.fxml")));
