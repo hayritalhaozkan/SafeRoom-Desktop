@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
@@ -14,71 +15,51 @@
 
 <BorderPane fx:id="mainPane" prefHeight="720.0" prefWidth="1280.0" styleClass="main-pane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.saferoom.controller.MainController">
     <left>
-        <VBox prefWidth="288.0" styleClass="sidebar">
+        <VBox prefWidth="80.0" styleClass="sidebar-compact">
             <children>
-                <!-- Logo ve Başlık -->
-                <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="12.0" styleClass="sidebar-header">
+                <!-- Logo -->
+                <HBox alignment="CENTER" prefHeight="70.0" styleClass="sidebar-header-compact">
                     <children>
-                        <Pane prefHeight="32.0" prefWidth="32.0">
+                        <StackPane prefHeight="32.0" prefWidth="32.0">
                             <children>
                                 <SVGPath content="M12 2L2 7V17L12 22L22 17V7L12 2Z M16.5 8C16.5 10 15 11 12 12C9 13 7.5 14 7.5 16" styleClass="sidebar-logo-icon" />
                             </children>
-                        </Pane>
-                        <Label styleClass="sidebar-title" text="SafeRoom" />
+                        </StackPane>
                     </children>
-                    <padding>
-                        <Insets left="16.0" />
-                    </padding>
                 </HBox>
                 <!-- Menü Butonları -->
-                <VBox fx:id="navBox" styleClass="sidebar-nav" VBox.vgrow="ALWAYS">
+                <VBox fx:id="navBox" styleClass="sidebar-nav-compact" VBox.vgrow="ALWAYS">
                     <children>
-                        <JFXButton fx:id="dashboardButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="Dashboard" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-dice-d6" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                        <!-- YENİ: Rooms Butonu Eklendi -->
-                        <JFXButton fx:id="roomsButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="Rooms" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-network-wired" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                        <JFXButton fx:id="messagesButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="Messages" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-comment" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                        <JFXButton fx:id="friendsButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="Friends" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-user-friends" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                        <JFXButton fx:id="fileVaultButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="File Vault" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="far-file-alt" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                        <JFXButton fx:id="settingsButton" alignment="CENTER_LEFT" graphicTextGap="12.0" styleClass="nav-button" text="Settings" prefWidth="256.0">
-                            <graphic>
-                                <FontIcon iconLiteral="fas-cog" styleClass="nav-icon" />
-                            </graphic>
-                        </JFXButton>
-                    </children>
-                </VBox>
-                <VBox styleClass="sidebar-footer">
-                    <children>
-                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <VBox fx:id="dashboardButton" alignment="CENTER" styleClass="nav-button-compact" spacing="4.0">
                             <children>
-                                <Label styleClass="user-avatar" text="U" />
-                                <VBox>
-                                    <children>
-                                        <Label styleClass="user-name" text="Username" />
-                                        <Label styleClass="user-status" text="Online" />
-                                    </children>
-                                </VBox>
+                                <FontIcon iconLiteral="fas-dice-d6" styleClass="nav-icon-compact" />
+                                <Label text="Dashboard" styleClass="nav-text-compact" />
                             </children>
-                        </HBox>
+                        </VBox>
+                        <VBox fx:id="roomsButton" alignment="CENTER" styleClass="nav-button-compact" spacing="4.0">
+                            <children>
+                                <FontIcon iconLiteral="fas-network-wired" styleClass="nav-icon-compact" />
+                                <Label text="Rooms" styleClass="nav-text-compact" />
+                            </children>
+                        </VBox>
+                        <VBox fx:id="messagesButton" alignment="CENTER" styleClass="nav-button-compact" spacing="4.0">
+                            <children>
+                                <FontIcon iconLiteral="fas-comment" styleClass="nav-icon-compact" />
+                                <Label text="Messages" styleClass="nav-text-compact" />
+                            </children>
+                        </VBox>
+                        <VBox fx:id="friendsButton" alignment="CENTER" styleClass="nav-button-compact" spacing="4.0">
+                            <children>
+                                <FontIcon iconLiteral="fas-user-friends" styleClass="nav-icon-compact" />
+                                <Label text="Friends" styleClass="nav-text-compact" />
+                            </children>
+                        </VBox>
+                        <VBox fx:id="fileVaultButton" alignment="CENTER" styleClass="nav-button-compact" spacing="4.0">
+                            <children>
+                                <FontIcon iconLiteral="far-file-alt" styleClass="nav-icon-compact" />
+                                <Label text="File Vault" styleClass="nav-text-compact" />
+                            </children>
+                        </VBox>
                     </children>
                 </VBox>
             </children>
@@ -87,19 +68,41 @@
     <center>
         <BorderPane styleClass="content-pane" >
             <top>
-                <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="16.0" styleClass="header-bar" BorderPane.alignment="CENTER">
+                <HBox fx:id="headerBar" alignment="CENTER_LEFT" prefHeight="56.0" spacing="16.0" styleClass="header-bar" BorderPane.alignment="CENTER">
                     <children>
                         <Label fx:id="viewTitleLabel" styleClass="view-title" text="Dashboard" />
-                        <Pane HBox.hgrow="ALWAYS" />
-                        <TextField promptText="Search..." styleClass="search-field" />
+                        <!-- Centered search field -->
+                        <HBox HBox.hgrow="ALWAYS" alignment="CENTER">
+                            <children>
+                                <TextField promptText="Search..." styleClass="search-field" prefWidth="420.0" />
+                            </children>
+                        </HBox>
                         <JFXButton styleClass="icon-button">
                             <graphic>
                                 <FontIcon iconLiteral="fas-bell" styleClass="header-icon" />
                             </graphic>
                         </JFXButton>
-                        <JFXButton fx:id="newRoomButton" styleClass="action-button" text="New Room">
+                        <!-- User Avatar with Status -->
+                        <Pane fx:id="userAvatarContainer" styleClass="user-avatar-container">
+                            <children>
+                                <Label fx:id="userAvatar" styleClass="user-avatar-header" text="U" />
+                                <Pane fx:id="statusDot" styleClass="status-dot" />
+                            </children>
+                        </Pane>
+                        <!-- Window control buttons -->
+                        <JFXButton fx:id="minButton" styleClass="window-button" mnemonicParsing="false">
                             <graphic>
-                                <FontIcon iconLiteral="fas-plus" styleClass="action-button-icon" />
+                                <FontIcon iconLiteral="fas-minus" styleClass="header-icon" />
+                            </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="maxButton" styleClass="window-button" mnemonicParsing="false">
+                            <graphic>
+                                <FontIcon iconLiteral="far-square" styleClass="header-icon" />
+                            </graphic>
+                        </JFXButton>
+                        <JFXButton fx:id="closeButton" styleClass="window-button window-close" mnemonicParsing="false">
+                            <graphic>
+                                <FontIcon iconLiteral="fas-times" styleClass="header-icon" />
                             </graphic>
                         </JFXButton>
                     </children>
