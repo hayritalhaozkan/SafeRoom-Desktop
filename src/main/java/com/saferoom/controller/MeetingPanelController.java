@@ -31,7 +31,7 @@ import java.util.Objects;
 
 public class MeetingPanelController {
 
-    // FXML Değişkenleri
+    // FXML Variables
     @FXML private AnchorPane centerContentAnchorPane;
     @FXML private StackPane contentStackPane;
     @FXML private VBox rightPanelVBox;
@@ -55,7 +55,7 @@ public class MeetingPanelController {
     @FXML private JFXButton recordButton;
     @FXML private JFXButton leaveButton;
 
-    // Sınıf Değişkenleri
+    // Class Variables
     private Meeting currentMeeting;
     private Participant currentUser;
     private MeetingRoleStrategy roleStrategy;
@@ -75,6 +75,8 @@ public class MeetingPanelController {
         rightPanelVBox.setVisible(false);
         rightPanelVBox.setManaged(false);
 
+        micButton.setOnAction(e -> toggleMic());
+        cameraButton.setOnAction(e -> toggleCamera());
         gridViewButton.setOnAction(e -> showGridView());
         speakerViewButton.setOnAction(e -> showSpeakerView());
         participantsToggle.setOnAction(e -> showParticipantsView());
@@ -87,10 +89,10 @@ public class MeetingPanelController {
 
         if (userRole == UserRole.ADMIN) {
             this.roleStrategy = new AdminRoleStrategy();
-            this.currentUser = new Participant("Admin User (You)", UserRole.ADMIN, true, true);
+            this.currentUser = new Participant("Admin User (You)", UserRole.ADMIN, true, false);
         } else {
             this.roleStrategy = new UserRoleStrategy();
-            this.currentUser = new Participant("Standard User (You)", UserRole.USER, true, true);
+            this.currentUser = new Participant("Standard User (You)", UserRole.USER, true, false);
         }
 
         currentMeeting.getParticipants().add(0, this.currentUser);
@@ -103,39 +105,124 @@ public class MeetingPanelController {
             meetingChatViewController.initChannel(currentMeeting.getMeetingId());
             meetingChatViewController.setHeader("Toplantı Sohbeti", "Online", "G", true);
             meetingChatViewController.setWidthConstraint(rightPanelVBox.getPrefWidth());
+            meetingChatViewController.setHeaderVisible(false);
         }
+
+        updateMicButtonState();
+        updateCameraButtonState();
     }
 
     @FXML
-    private void toggleRightPanel() {
-        if (!isPanelOpen) {
+    private void toggleMic() {
+        if (currentUser == null) return;
+        boolean newMutedState = !currentUser.isMuted();
+        currentUser.setMuted(newMutedState);
+        updateMicButtonState();
+    }
+
+    @FXML
+    private void toggleCamera() {
+        if (currentUser == null) return;
+        boolean newCameraState = !currentUser.isCameraOn();
+        currentUser.setCameraOn(newCameraState);
+        updateCameraButtonState();
+    }
+
+    private void updateMicButtonState() {
+        if (currentUser.isMuted()) {
+            micButton.setText("Unmute");
+            micButton.getStyleClass().add("active");
+            if (micButton.getGraphic() instanceof FontIcon) {
+                ((FontIcon) micButton.getGraphic()).setIconLiteral("fas-microphone-slash");
+            }
+        } else {
+            micButton.setText("Mute");
+            micButton.getStyleClass().remove("active");
+            if (micButton.getGraphic() instanceof FontIcon) {
+                ((FontIcon) micButton.getGraphic()).setIconLiteral("fas-microphone");
+            }
+        }
+    }
+
+    private void updateCameraButtonState() {
+        if (!currentUser.isCameraOn()) {
+            cameraButton.setText("Start Video");
+            cameraButton.getStyleClass().add("active");
+            if (cameraButton.getGraphic() instanceof FontIcon) {
+                ((FontIcon) cameraButton.getGraphic()).setIconLiteral("fas-video-slash");
+            }
+        } else {
+            cameraButton.setText("Stop Video");
+            cameraButton.getStyleClass().remove("active");
+            if (cameraButton.getGraphic() instanceof FontIcon) {
+                ((FontIcon) cameraButton.getGraphic()).setIconLiteral("fas-video");
+            }
+        }
+    }
+
+    // ## CHANGE IS HERE: The animation logic is corrected ##
+    private void toggleRightPanel(Runnable onAnimationFinished) {
+        // Determine the state *before* the animation starts
+        final boolean closing = isPanelOpen;
+
+        if (!closing) {
+            // If opening, make it visible and managed first
             rightPanelVBox.setManaged(true);
             rightPanelVBox.setVisible(true);
         }
 
         Timeline timeline = new Timeline();
-        double targetAnchorValue = isPanelOpen ? 0.0 : rightPanelVBox.getPrefWidth();
+        double targetAnchorValue = closing ? 0.0 : rightPanelVBox.getPrefWidth();
         KeyValue keyValue = new KeyValue(contentRightAnchorProperty, targetAnchorValue);
         KeyFrame keyFrame = new KeyFrame(animationDuration, keyValue);
         timeline.getKeyFrames().add(keyFrame);
 
-        if (isPanelOpen) {
-            timeline.setOnFinished(e -> {
+        timeline.setOnFinished(e -> {
+            if (closing) {
+                // If the animation was for closing, hide it now
                 rightPanelVBox.setVisible(false);
                 rightPanelVBox.setManaged(false);
-            });
-        }
+            }
+            if (onAnimationFinished != null) {
+                onAnimationFinished.run();
+            }
+        });
 
         timeline.play();
-        isPanelOpen = !isPanelOpen;
+        isPanelOpen = !closing; // Update the state
+    }
+
+    @FXML
+    private void toggleRightPanelAndGoToParticipants() {
+        Runnable switchToParticipants = () -> {
+            participantsToggle.setSelected(true);
+            showParticipantsView();
+        };
+
+        if (isPanelOpen && participantsToggle.isSelected()) {
+            // If open and on the right tab, just close it.
+            toggleRightPanel(null);
+        } else if (isPanelOpen && !participantsToggle.isSelected()) {
+            // If open but on the wrong tab, just switch.
+            switchToParticipants.run();
+        }
+        else {
+            // If closed, switch first, then open.
+            switchToParticipants.run();
+            toggleRightPanel(null);
+        }
     }
 
     @FXML
     private void toggleRightPanelAndGoToChat() {
-        chatToggle.setSelected(true);
-        showChatView();
-        if (!isPanelOpen) {
-            toggleRightPanel();
+        if (isPanelOpen && chatToggle.isSelected()) {
+            toggleRightPanel(null);
+        } else {
+            chatToggle.setSelected(true);
+            showChatView();
+            if (!isPanelOpen) {
+                toggleRightPanel(null);
+            }
         }
     }
 

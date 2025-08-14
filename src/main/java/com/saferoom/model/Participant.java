@@ -28,4 +28,19 @@ public class Participant {
     public BooleanProperty cameraOnProperty() { return cameraOn; }
     public boolean isMuted() { return muted.get(); }
     public BooleanProperty mutedProperty() { return muted; }
+
+    // ## ADDED METHODS ##
+    /**
+     * Updates the participant's camera state.
+     */
+    public void setCameraOn(boolean isOn) {
+        this.cameraOn.set(isOn);
+    }
+
+    /**
+     * Updates the participant's muted state.
+     */
+    public void setMuted(boolean isMuted) {
+        this.muted.set(isMuted);
+    }
 }

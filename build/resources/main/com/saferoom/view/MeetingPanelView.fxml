@@ -41,7 +41,7 @@
                 <HBox alignment="CENTER_RIGHT" minWidth="200.0" spacing="16.0">
                     <children>
                         <Label fx:id="timerLabel" text="13:03:34" styleClass="timer-label" />
-                        <JFXButton fx:id="participantsButtonTop" onAction="#toggleRightPanel" styleClass="top-bar-button" text="Participants">
+                        <JFXButton fx:id="participantsButtonTop" onAction="#toggleRightPanelAndGoToParticipants" styleClass="top-bar-button" text="Participants">
                             <graphic><FontIcon iconLiteral="fas-users" styleClass="top-bar-icon" /></graphic>
                         </JFXButton>
                     </children>
@@ -97,8 +97,8 @@
                 <JFXButton styleClass="bottom-bar-icon-button" text=" "><graphic><FontIcon iconLiteral="fas-cog" styleClass="bottom-bar-icon" /></graphic></JFXButton>
                 <JFXButton styleClass="bottom-bar-icon-button" text=" "><graphic><FontIcon iconLiteral="fas-volume-up" styleClass="bottom-bar-icon" /></graphic></JFXButton>
                 <Pane HBox.hgrow="ALWAYS" />
-                <JFXButton fx:id="micButton" styleClass="meeting-control-button" text="Mute"><graphic><FontIcon iconLiteral="fas-microphone" styleClass="control-icon" /></graphic></JFXButton>
-                <JFXButton fx:id="cameraButton" styleClass="meeting-control-button" text="Stop Video"><graphic><FontIcon iconLiteral="fas-video" styleClass="control-icon" /></graphic></JFXButton>
+                <JFXButton fx:id="micButton" onAction="#toggleMic" styleClass="meeting-control-button" text="Mute"><graphic><FontIcon iconLiteral="fas-microphone" styleClass="control-icon" /></graphic></JFXButton>
+                <JFXButton fx:id="cameraButton" onAction="#toggleCamera" styleClass="meeting-control-button" text="Stop Video"><graphic><FontIcon iconLiteral="fas-video" styleClass="control-icon" /></graphic></JFXButton>
                 <JFXButton fx:id="chatButtonBottom" onAction="#toggleRightPanelAndGoToChat" styleClass="meeting-control-button-blue" text="Chat"><graphic><FontIcon iconLiteral="fas-comment" styleClass="control-icon" /></graphic></JFXButton>
                 <JFXButton fx:id="screenShareButton" styleClass="meeting-control-button" text="Share"><graphic><FontIcon iconLiteral="fas-desktop" styleClass="control-icon" /></graphic></JFXButton>
                 <JFXButton fx:id="recordButton" styleClass="meeting-control-button" text="Record"><graphic><FontIcon iconLiteral="fas-dot-circle" styleClass="control-icon" /></graphic></JFXButton>

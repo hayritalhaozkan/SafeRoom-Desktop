@@ -4,21 +4,20 @@ import com.saferoom.model.Message;
 import com.saferoom.model.User;
 import com.saferoom.service.ChatService;
 import com.saferoom.view.cell.MessageCell;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane; // Yeni import
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 public class ChatViewController {
 
-    // --- YENİ EKLENEN FXML ALANI ---
-    @FXML private BorderPane chatPane; // Arayüzün kök paneline erişim
-
-    // Mevcut FXML alanları
+    @FXML private BorderPane chatPane;
     @FXML private Label chatPartnerAvatar;
     @FXML private Label chatPartnerName;
     @FXML private Label chatPartnerStatus;
@@ -28,10 +27,12 @@ public class ChatViewController {
     @FXML private Button phoneButton;
     @FXML private Button videoButton;
     @FXML private HBox chatHeader;
+    @FXML private VBox emptyChatPlaceholder;
 
     private User currentUser;
     private String currentChannelId;
     private ChatService chatService;
+    private ObservableList<Message> messages;
 
     @FXML
     public void initialize() {
@@ -39,17 +40,38 @@ public class ChatViewController {
         this.chatService = ChatService.getInstance();
 
         chatService.newMessageProperty().addListener((obs, oldMsg, newMsg) -> {
-            if (newMsg != null && newMsg.getSenderId().equals(currentUser.getId())) {
-                messageListView.scrollTo(messageListView.getItems().size() - 1);
+            if (newMsg != null && messages != null && messages.contains(newMsg)) {
+                if (newMsg.getSenderId().equals(currentUser.getId())) {
+                    messageListView.scrollTo(messages.size() - 1);
+                }
             }
         });
     }
 
-    // --- YENİ EKLENEN METOT ---
-    /**
-     * Bu panelin maksimum genişliğini dışarıdan ayarlar.
-     * @param width Ayarlanacak maksimum genişlik.
-     */
+    public void initChannel(String channelId) {
+        this.currentChannelId = channelId;
+        this.messages = chatService.getMessagesForChannel(channelId);
+
+        messageListView.setItems(messages);
+        messageListView.setCellFactory(param -> new MessageCell(currentUser.getId()));
+
+        updatePlaceholderVisibility();
+
+        messages.addListener((ListChangeListener<Message>) c -> {
+            while (c.next()) {
+                updatePlaceholderVisibility();
+            }
+        });
+
+        if (!messages.isEmpty()) {
+            messageListView.scrollTo(messages.size() - 1);
+        }
+    }
+
+    // ==========================================================
+    // DEĞİŞİKLİK: İçi boş olan metotlar dolduruldu
+    // ==========================================================
+
     public void setWidthConstraint(double width) {
         if (chatPane != null) {
             chatPane.setMaxWidth(width);
@@ -57,22 +79,45 @@ public class ChatViewController {
         }
     }
 
-    public void initChannel(String channelId) {
-        this.currentChannelId = channelId;
-        ObservableList<Message> messages = chatService.getMessagesForChannel(channelId);
-        messageListView.setItems(messages);
-        messageListView.setCellFactory(param -> new MessageCell(currentUser.getId()));
-        if (!messages.isEmpty()) {
-            messageListView.scrollTo(messages.size() - 1);
+    public void setHeaderVisible(boolean visible) {
+        if (chatHeader != null) {
+            chatHeader.setVisible(visible);
+            chatHeader.setManaged(visible); // false ise yer kaplamaz
         }
     }
 
     public void setHeader(String name, String status, String avatarChar, boolean isGroupChat) {
-        // ... (Bu metodun içeriği aynı kalıyor) ...
+        chatPartnerName.setText(name);
+        chatPartnerStatus.setText(status);
+        chatPartnerAvatar.setText(avatarChar);
+
+        chatPartnerStatus.getStyleClass().removeAll("status-online", "status-offline");
+        if (status.equalsIgnoreCase("Online")) {
+            chatPartnerStatus.getStyleClass().add("status-online");
+        } else {
+            chatPartnerStatus.getStyleClass().add("status-offline");
+        }
+
+        phoneButton.setVisible(!isGroupChat);
+        videoButton.setVisible(!isGroupChat);
     }
 
     @FXML
     private void handleSendMessage() {
-        // ... (Bu metodun içeriği aynı kalıyor) ...
+        String text = messageInputField.getText();
+        if (text == null || text.trim().isEmpty()) return;
+
+        chatService.sendMessage(currentChannelId, text, currentUser);
+
+        messageInputField.clear();
+    }
+
+    private void updatePlaceholderVisibility() {
+        boolean isListEmpty = (messages == null || messages.isEmpty());
+        if (emptyChatPlaceholder != null) {
+            emptyChatPlaceholder.setVisible(isListEmpty);
+            emptyChatPlaceholder.setManaged(isListEmpty);
+        }
+        messageListView.setVisible(!isListEmpty);
     }
 }
