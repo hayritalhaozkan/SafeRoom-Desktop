@@ -516,6 +516,7 @@
     -fx-icon-color: white;
 }
 
+
 .bottom-bar-icon-button {
     -fx-background-color: transparent;
 }
@@ -571,7 +572,7 @@
 }
 
 .right-panel {
-    -fx-background-color: #18212f;
+    -fx-background-color: #1e293b;
 }
 
 .right-panel-toggle-bar {
@@ -706,4 +707,11 @@
 .popup-menu-item-danger:hover {
     -fx-background-color: #ef4444;
     -fx-text-fill: white;
+}
+
+/* Stiller dosyanızın herhangi bir yerine ekleyin */
+.error-field {
+    -fx-border-color: #e53e3e; /* Kırmızı bir ton */
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 4px; /* Kenar yuvarlaklığı */
 }

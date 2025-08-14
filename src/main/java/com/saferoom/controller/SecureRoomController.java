@@ -72,7 +72,20 @@ public class SecureRoomController {
                 Parent meetingRoot = meetingLoader.load();
 
                 MeetingPanelController meetingController = meetingLoader.getController();
-                Meeting secureMeeting = new Meeting(roomIdField.getText(), "Secure Room");
+
+                // =========================================================================
+                // DEĞİŞİKLİK BURADA: Oda ID'si boş ise rastgele bir ID oluşturuyoruz.
+                // =========================================================================
+                String roomId = roomIdField.getText();
+                if (roomId == null || roomId.trim().isEmpty()) {
+                    // Basit bir rastgele ID oluşturma (daha karmaşık bir yapı da kullanılabilir)
+                    roomId = "SecureRoom-" + (new Random().nextInt(90000) + 10000);
+                }
+                // =========================================================================
+
+                // Artık 'roomId' değişkenini kullanarak Meeting nesnesini güvenle oluşturabiliriz.
+                Meeting secureMeeting = new Meeting(roomId, "Secure Room");
+
                 meetingController.initData(secureMeeting, UserRole.ADMIN);
 
                 returnScene.setRoot(meetingRoot);

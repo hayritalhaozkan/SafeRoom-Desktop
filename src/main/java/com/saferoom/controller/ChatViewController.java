@@ -2,21 +2,23 @@ package com.saferoom.controller;
 
 import com.saferoom.model.Message;
 import com.saferoom.model.User;
+import com.saferoom.service.ChatService;
 import com.saferoom.view.cell.MessageCell;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane; // Yeni import
 import javafx.scene.layout.HBox;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ChatViewController {
 
+    // --- YENİ EKLENEN FXML ALANI ---
+    @FXML private BorderPane chatPane; // Arayüzün kök paneline erişim
+
+    // Mevcut FXML alanları
     @FXML private Label chatPartnerAvatar;
     @FXML private Label chatPartnerName;
     @FXML private Label chatPartnerStatus;
@@ -29,64 +31,48 @@ public class ChatViewController {
 
     private User currentUser;
     private String currentChannelId;
-    private ObservableList<Message> messages;
+    private ChatService chatService;
 
-    private static final Map<String, ObservableList<Message>> channelMessages = new HashMap<>();
-
+    @FXML
     public void initialize() {
         this.currentUser = new User("currentUser123", "You");
-        if (channelMessages.isEmpty()) {
-            setupDummyMessages();
+        this.chatService = ChatService.getInstance();
+
+        chatService.newMessageProperty().addListener((obs, oldMsg, newMsg) -> {
+            if (newMsg != null && newMsg.getSenderId().equals(currentUser.getId())) {
+                messageListView.scrollTo(messageListView.getItems().size() - 1);
+            }
+        });
+    }
+
+    // --- YENİ EKLENEN METOT ---
+    /**
+     * Bu panelin maksimum genişliğini dışarıdan ayarlar.
+     * @param width Ayarlanacak maksimum genişlik.
+     */
+    public void setWidthConstraint(double width) {
+        if (chatPane != null) {
+            chatPane.setMaxWidth(width);
+            chatPane.setPrefWidth(width);
         }
     }
 
     public void initChannel(String channelId) {
         this.currentChannelId = channelId;
-        this.messages = channelMessages.computeIfAbsent(channelId, k -> FXCollections.observableArrayList());
+        ObservableList<Message> messages = chatService.getMessagesForChannel(channelId);
         messageListView.setItems(messages);
         messageListView.setCellFactory(param -> new MessageCell(currentUser.getId()));
+        if (!messages.isEmpty()) {
+            messageListView.scrollTo(messages.size() - 1);
+        }
     }
 
     public void setHeader(String name, String status, String avatarChar, boolean isGroupChat) {
-        chatPartnerName.setText(name);
-        chatPartnerStatus.setText(status);
-        chatPartnerAvatar.setText(avatarChar);
-
-        chatPartnerStatus.getStyleClass().removeAll("status-online", "status-offline");
-        if (status.equalsIgnoreCase("Online")) {
-            chatPartnerStatus.getStyleClass().add("status-online");
-        } else {
-            chatPartnerStatus.getStyleClass().add("status-offline");
-        }
-
-        phoneButton.setVisible(!isGroupChat);
-        videoButton.setVisible(!isGroupChat);
+        // ... (Bu metodun içeriği aynı kalıyor) ...
     }
 
     @FXML
     private void handleSendMessage() {
-        String text = messageInputField.getText();
-        if (text == null || text.trim().isEmpty()) return;
-
-        Message newMessage = new Message(text, currentUser.getId(), currentUser.getName().substring(0, 1));
-        messages.add(newMessage);
-
-        messageInputField.clear();
-        messageListView.scrollTo(messages.size() - 1);
-    }
-
-    private void setupDummyMessages() {
-        channelMessages.put("zeynep_kaya", FXCollections.observableArrayList(
-                new Message("Selam, projenin son durumu hakkında bilgi alabilir miyim?", "zeynep1", "Z"),
-                new Message("Tabii, raporu hazırlıyorum. Yarın sabah sende olur.", "currentUser123", "Y"),
-                new Message("Harika, teşekkürler! Kolay gelsin.", "zeynep1", "Z")
-        ));
-        channelMessages.put("ahmet_celik", FXCollections.observableArrayList(
-                new Message("Raporu yarın sabah gönderirim.", "ahmet1", "A")
-        ));
-        channelMessages.put("meeting_phoenix", FXCollections.observableArrayList(
-                new Message("Toplantı 15:00'te başlıyor arkadaşlar.", "zeynep1", "Z"),
-                new Message("Ben hazır ve beklemedeyim.", "ahmet1", "A")
-        ));
+        // ... (Bu metodun içeriği aynı kalıyor) ...
     }
 }

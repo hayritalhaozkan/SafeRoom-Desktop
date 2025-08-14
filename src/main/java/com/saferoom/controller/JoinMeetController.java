@@ -62,14 +62,37 @@ public class JoinMeetController {
 
     private void handleJoin() {
         if (micAnimation != null) micAnimation.stop();
+
+        // =========================================================================
+        // DEĞİŞİKLİK BURADA: Oda ID'sinin boş olup olmadığını kontrol ediyoruz.
+        // =========================================================================
+        String roomId = roomIdField.getText();
+        if (roomId == null || roomId.trim().isEmpty()) {
+            // Hata stilini ekle ve metodu sonlandır.
+            roomIdField.getStyleClass().remove("error-field"); // Önceki hatayı temizle
+            roomIdField.getStyleClass().add("error-field"); // Yeni hatayı ekle
+            System.out.println("HATA: Katılmak için Oda ID'si girilmelidir.");
+            return; // Katılma işlemini burada durdur.
+        }
+
+        // Eğer doğrulama başarılıysa, hata stili (varsa) kaldırılır.
+        roomIdField.getStyleClass().remove("error-field");
+        // =========================================================================
+
+
         if (returnScene != null) {
             try {
                 FXMLLoader meetingLoader = new FXMLLoader(MainApp.class.getResource("view/MeetingPanelView.fxml"));
                 Parent meetingRoot = meetingLoader.load();
 
                 MeetingPanelController meetingController = meetingLoader.getController();
-                String roomName = roomIdField.getText().isEmpty() ? "Joined Room" : roomIdField.getText();
-                Meeting meetingToJoin = new Meeting(roomIdField.getText(), roomName);
+
+                // roomName için artık 'roomId' değişkenini kullanıyoruz.
+                String roomName = roomId.isEmpty() ? "Joined Room" : roomId;
+
+                // Meeting nesnesini 'roomId' ile oluşturuyoruz.
+                Meeting meetingToJoin = new Meeting(roomId, roomName);
+
                 meetingController.initData(meetingToJoin, UserRole.USER);
 
                 returnScene.setRoot(meetingRoot);
@@ -82,8 +105,11 @@ public class JoinMeetController {
 
     private void startMicTestAnimation() {
         micAnimation = new Timeline(new KeyFrame(Duration.millis(100), event -> {
-            Random random = new Random();
-            micTestBar.setProgress(random.nextDouble() * 0.7);
+            if (micToggle.isSelected()) {
+                micTestBar.setProgress(new Random().nextDouble() * 0.7);
+            } else {
+                micTestBar.setProgress(0);
+            }
         }));
         micAnimation.setCycleCount(Animation.INDEFINITE);
         micAnimation.play();

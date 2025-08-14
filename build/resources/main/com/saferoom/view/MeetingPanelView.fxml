@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -49,23 +50,23 @@
         </HBox>
     </top>
     <center>
-        <StackPane fx:id="centerStackPane">
+        <AnchorPane fx:id="centerContentAnchorPane">
             <children>
-                <StackPane fx:id="contentStackPane">
+                <StackPane fx:id="contentStackPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
-                        <BorderPane fx:id="gridWrapperPane">
-                            <center>
-                                <GridPane fx:id="videoGrid" hgap="16" vgap="16">
-                                    <padding><Insets bottom="16.0" left="24.0" right="24.0" top="16.0" /></padding>
-                                </GridPane>
-                            </center>
-                        </BorderPane>
+                        <GridPane fx:id="videoGrid" hgap="16.0" vgap="16.0">
+                            <padding>
+                                <Insets bottom="16.0" left="24.0" right="24.0" top="16.0" />
+                            </padding>
+                        </GridPane>
                         <BorderPane fx:id="speakerViewPane" visible="false">
-                            <padding><Insets bottom="16.0" left="24.0" right="24.0" top="16.0" /></padding>
+                            <padding>
+                                <Insets bottom="16.0" left="24.0" right="24.0" top="16.0" />
+                            </padding>
                         </BorderPane>
                     </children>
                 </StackPane>
-                <VBox fx:id="rightPanelVBox" alignment="TOP_CENTER" prefWidth="320" styleClass="right-panel" StackPane.alignment="CENTER_RIGHT">
+                <VBox fx:id="rightPanelVBox" prefWidth="320.0" styleClass="right-panel" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="-320.0" AnchorPane.topAnchor="0.0">
                     <children>
                         <HBox alignment="CENTER" styleClass="right-panel-toggle-bar">
                             <children>
@@ -81,17 +82,13 @@
                                     <content><VBox fx:id="participantsListVBox" spacing="8" /></content>
                                     <padding><Insets top="8" /></padding>
                                 </ScrollPane>
-                                <VBox fx:id="chatVBox" visible="false" spacing="10" style="-fx-padding: 10;">
-                                    <children>
-                                        <Label text="Chat functionality is not implemented yet." styleClass="placeholder-text" wrapText="true" />
-                                    </children>
-                                </VBox>
+                                <fx:include fx:id="meetingChatView" source="ChatView.fxml" visible="false" />
                             </children>
                         </StackPane>
                     </children>
                 </VBox>
             </children>
-        </StackPane>
+        </AnchorPane>
     </center>
     <bottom>
         <HBox alignment="CENTER" prefHeight="80.0" spacing="16.0" styleClass="meeting-bottom-bar">
