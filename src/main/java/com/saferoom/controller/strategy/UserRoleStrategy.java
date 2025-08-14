@@ -1,12 +1,14 @@
 package com.saferoom.controller.strategy;
 
 import com.saferoom.model.Participant;
-import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
+import java.util.Collections;
+import java.util.List;
 
 public class UserRoleStrategy implements MeetingRoleStrategy {
 
     @Override
-    public Node createParticipantListItemControls(Participant currentUser, Participant targetParticipant) {
-        return null; // Standart kullanıcılar kontrol butonlarını görmez.
+    public List<MenuItem> createParticipantMenuItems(Participant currentUser, Participant targetParticipant, Runnable onStateChanged) {
+        return Collections.emptyList();
     }
 }

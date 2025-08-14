@@ -1,8 +1,9 @@
 package com.saferoom.controller.strategy;
 
 import com.saferoom.model.Participant;
-import javafx.scene.Node;
+import javafx.scene.control.MenuItem;
+import java.util.List;
 
 public interface MeetingRoleStrategy {
-    Node createParticipantListItemControls(Participant currentUser, Participant targetParticipant);
+    List<MenuItem> createParticipantMenuItems(Participant currentUser, Participant targetParticipant, Runnable onStateChanged);
 }

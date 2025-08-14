@@ -44,8 +44,8 @@
                 <VBox fx:id="emptyChatPlaceholder" alignment="CENTER" managed="false" spacing="16.0" styleClass="empty-chat-placeholder" visible="false">
                     <children>
                         <FontIcon iconLiteral="fas-comments" styleClass="empty-chat-icon" />
-                        <Label styleClass="empty-chat-text" text="Henüz mesaj yok." />
-                        <Label styleClass="empty-chat-subtext" text="Sohbeti ilk mesajı göndererek başlatın." />
+                        <Label styleClass="empty-chat-text" text="No messages yet." />
+                        <Label styleClass="empty-chat-subtext" text="Start the conversation by sending the first message." />
                     </children>
                 </VBox>
             </children>

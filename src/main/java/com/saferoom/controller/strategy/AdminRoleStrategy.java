@@ -1,53 +1,51 @@
 package com.saferoom.controller.strategy;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXPopup;
 import com.saferoom.model.Participant;
-import javafx.scene.Node;
-import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AdminRoleStrategy implements MeetingRoleStrategy {
 
     @Override
-    public Node createParticipantListItemControls(Participant currentUser, Participant targetParticipant) {
-        if (!currentUser.equals(targetParticipant)) {
-            JFXButton optionsButton = new JFXButton();
-            FontIcon icon = new FontIcon("fas-ellipsis-v");
-            icon.getStyleClass().add("participant-action-icon");
-            optionsButton.setGraphic(icon);
-            optionsButton.getStyleClass().add("participant-action-button");
-
-            JFXPopup popup = createAdminPopup(targetParticipant);
-            optionsButton.setOnAction(event -> popup.show(optionsButton, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.RIGHT, -10, 0));
-
-            return optionsButton;
+    public List<MenuItem> createParticipantMenuItems(Participant currentUser, Participant targetParticipant, Runnable onStateChanged) {
+        if (currentUser.equals(targetParticipant)) {
+            return Collections.emptyList();
         }
-        return null;
-    }
 
-    private JFXPopup createAdminPopup(Participant targetParticipant) {
-        JFXButton muteMicButton = new JFXButton("Mikrofonu Kapat");
-        JFXButton stopCameraButton = new JFXButton("Kamerayı Kapat");
-        JFXButton removeButton = new JFXButton("Toplantıdan At");
+        List<MenuItem> menuItems = new ArrayList<>();
 
-        muteMicButton.setOnAction(e -> System.out.println("ADMIN ACTION: " + targetParticipant.getName() + " susturuldu."));
-        stopCameraButton.setOnAction(e -> System.out.println("ADMIN ACTION: " + targetParticipant.getName() + " kamerası kapatıldı."));
-        removeButton.setOnAction(e -> System.out.println("ADMIN ACTION: " + targetParticipant.getName() + " atıldı."));
-
-        VBox content = new VBox(muteMicButton, stopCameraButton, removeButton);
-        content.getStyleClass().add("popup-menu-container");
-
-        for (Node node : content.getChildren()) {
-            if (node instanceof JFXButton) {
-                ((JFXButton) node).getStyleClass().add("popup-menu-item");
-            }
+        if (!targetParticipant.isMuted()) {
+            MenuItem muteMicItem = new MenuItem("Mute Microphone");
+            muteMicItem.setOnAction(e -> {
+                targetParticipant.setMuted(true);
+                onStateChanged.run();
+            });
+            menuItems.add(muteMicItem);
         }
-        removeButton.getStyleClass().add("popup-menu-item-danger");
 
-        JFXPopup popup = new JFXPopup(content);
-        // DÜZELTME: Kütüphane versiyonuyla uyumsuz olan animasyon satırı kaldırıldı.
-        // popup.setAnimationType(JFXPopup.AnimationType.FADE);
-        return popup;
+        if (targetParticipant.isCameraOn()) {
+            MenuItem stopCamItem = new MenuItem("Stop Camera");
+            stopCamItem.setOnAction(e -> {
+                targetParticipant.setCameraOn(false);
+                onStateChanged.run();
+            });
+            menuItems.add(stopCamItem);
+        }
+
+        if (!menuItems.isEmpty()) {
+            menuItems.add(new SeparatorMenuItem());
+        }
+
+        MenuItem kickItem = new MenuItem("Kick from Meeting");
+        kickItem.getStyleClass().add("menu-item-danger");
+        kickItem.setOnAction(e -> {
+            System.out.println("ADMIN ACTION: Kicked " + targetParticipant.getName());
+        });
+        menuItems.add(kickItem);
+
+        return menuItems;
     }
 }
